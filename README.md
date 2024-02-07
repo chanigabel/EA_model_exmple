@@ -1,5 +1,4 @@
 06/02
-</n>
 At first, I searched for all the existing tables, but I couldn't find any documentation detailing the tables. 
 only  a few important tables. Then, I started making queries to retrieve different tables, 
 attempting to understand how the data is structured and what information is contained in the queries. 
