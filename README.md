@@ -11,3 +11,5 @@ Finally, I sorted out the GitHub permissions and uploaded the queries in the for
 I tried to describe the purpose of each query.
 FID - Find in Diagram
 S/E - Start - End
+08/02
+I created various queries to configure display options. An SQL file named '08-02' has been uploaded containing these queries. The diagram query works partially; however, in the object query, the diagram is also displayed. Additionally, in the class query, there are objects without a class, meaning that some objects cannot be associated with a specific class in the project.
