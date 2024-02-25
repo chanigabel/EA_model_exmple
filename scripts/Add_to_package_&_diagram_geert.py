@@ -1,6 +1,7 @@
 import win32com.client
+# num - order of functions
 
-
+# 5
 def add_master_document_with_details(
     repository,
     package_GUID,
@@ -35,7 +36,7 @@ def add_master_document_with_details(
         
     return master_document_package
 
-
+# 7
 def add_model_document_for_package(
    master_document, package, name, treepos, template
 ):
@@ -57,7 +58,7 @@ def add_model_document_for_package(
 
     return model_doc_element
 
-
+# 6
 def add_model_document_for_diagram(repository,master_document, diagram, name, treepos, template):
     # Get the diagram ID
     diagram_id = diagram.DiagramID
@@ -73,7 +74,7 @@ def add_model_document_for_diagram(repository,master_document, diagram, name, tr
     # Refresh the diagram view
     repository.ReloadDiagram(diagram_id)
 
-
+#4
 def make_use_case_master_document(repository, current_diagram, package_GUID):
     document_version = input(
         "Please enter the version of this document (e.g., x.y.z): "
@@ -95,18 +96,7 @@ def make_use_case_master_document(repository, current_diagram, package_GUID):
 
     return None
 
-
-def get_nested_diagram_owner_for_element(element, element_type):
-    diagram_owner = None
-
-    for nested_element in element.Elements:
-        if nested_element.Type == element_type and nested_element.Diagrams.Count > 0:
-            diagram_owner = nested_element
-            break
-
-    return diagram_owner
-
-
+# 11
 def sort_elements_by_name(elements):
     go_again = True
 
@@ -123,7 +113,7 @@ def sort_elements_by_name(elements):
 
     return elements
 
-
+# 8
 def get_diagram_objects(repository, diagram, object_type):
     diagram_objects = diagram.DiagramObjects
     filtered_objects = []
@@ -137,7 +127,7 @@ def get_diagram_objects(repository, diagram, object_type):
 
     return filtered_objects
 
-
+# 9
 def get_elements_from_diagram_in_boundary(repository, diagram, element_type, boundary):
     diagram_elements = diagram.DiagramObjects
     filtered_elements = []
@@ -154,7 +144,7 @@ def get_elements_from_diagram_in_boundary(repository, diagram, element_type, bou
 
     return filtered_elements
 
-
+# 10
 def get_elements_from_diagram(repository, diagram, element_type):
     diagram_objects = diagram.DiagramObjects
     filtered_elements = []
@@ -168,7 +158,7 @@ def get_elements_from_diagram(repository, diagram, element_type):
 
     return filtered_elements
 
-
+# 12
 def add_use_cases(master_document, usecases, starting_index):
     for usecase in usecases:
         new_element = master_document.Elements.AddNew(usecase.Name, "UseCase")
@@ -178,7 +168,7 @@ def add_use_cases(master_document, usecases, starting_index):
 
     return starting_index
 
-
+#3
 def create_use_case_document(repository, diagram, documents_package_GUID):
     master_document = make_use_case_master_document(
         repository, diagram, documents_package_GUID
@@ -223,7 +213,7 @@ def create_use_case_document(repository, diagram, documents_package_GUID):
         repository.RefreshModelView(master_document.PackageID)
         repository.ShowInProjectView(master_document)
 
-
+#2
 def on_diagram_script():
     ea = win32com.client.Dispatch("EA.App")
     repository = ea.Repository
@@ -232,14 +222,11 @@ def on_diagram_script():
     if documents_package is not None:
         package_GUID = documents_package.PackageGUID
         current_diagram = repository.GetCurrentDiagram()
-        # print(current_diagram.name)
-        # print(repository.GetPackageByGuid(package_GUID).name)
-        # print(current_diagram)
         if current_diagram is not None:
             create_use_case_document(repository, current_diagram, package_GUID)
             print("Select the Master Document and press F8 to generate document")
         else:
             print("This script requires a diagram to be visible")
 
-
+#1
 on_diagram_script()
