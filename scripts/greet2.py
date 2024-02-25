@@ -219,11 +219,13 @@ def create_use_case_document(diagram, documents_package_GUID):
 
 def on_diagram_script():
     global package_GUID
-    documents_package = ea.Repository.GetTreeSelectedPackage()
+    documents_package = repository.GetTreeSelectedPackage()
     if documents_package is not None:
+        package_GUID = documents_package.PackageGUID
         current_diagram = repository.GetCurrentDiagram()
+        # current_diagram = repository.GetDiagramByID(10)
+        print(current_diagram.name)
         if current_diagram is not None:
-            package_GUID = documents_package.PackageGUID
             create_use_case_document(current_diagram, package_GUID)
             print("Select the Master Document and press F8 to generate document")
         else:
