@@ -182,7 +182,7 @@ def create_use_case_document(repository, diagram, documents_package_GUID):
             diagram,
             diagram.Name,
             i,
-            "Use Case Details",
+            "connector",
         )
         i += 1
 
@@ -190,25 +190,25 @@ def create_use_case_document(repository, diagram, documents_package_GUID):
         add_model_document_for_package(
             master_document,
             diagram_package,
-            diagram.Name + " Actors",
+            diagram.Name,
             i,
-            "UCD_Actors",
+            "connector",
         )
         i += 1
 
-        boundaries = get_diagram_objects(repository, diagram, "Boundary")
-        usecases = []
+        # boundaries = get_diagram_objects(repository, diagram, "Boundary")
+        # usecases = []
 
-        if len(boundaries) > 0:
-            usecases = get_elements_from_diagram_in_boundary(
-                diagram, "UseCase", boundaries[0]
-            )
-            print("boundary found")
-        else:
-            usecases = get_elements_from_diagram(repository, diagram, "UseCase")
+        # if len(boundaries) > 0:
+        #     usecases = get_elements_from_diagram_in_boundary(
+        #         diagram, "UseCase", boundaries[0]
+        #     )
+        #     print("boundary found")
+        # else:
+        #     usecases = get_elements_from_diagram(repository, diagram, "UseCase")
 
-        usecases = sort_elements_by_name(usecases)
-        i = add_use_cases(master_document, usecases, i)
+        # usecases = sort_elements_by_name(usecases)
+        # i = add_use_cases(master_document, usecases, i)
 
         repository.RefreshModelView(master_document.PackageID)
         repository.ShowInProjectView(master_document)
@@ -217,7 +217,7 @@ def create_use_case_document(repository, diagram, documents_package_GUID):
 def on_diagram_script():
     ea = win32com.client.Dispatch("EA.App")
     repository = ea.Repository
-
+    
     documents_package = repository.GetTreeSelectedPackage()
     if documents_package is not None:
         package_GUID = documents_package.PackageGUID
