@@ -81,13 +81,10 @@ def make_master_document(repository, package_GUID):
 
 #4
 def create_diagram(repository, package_guid, diagram_name, diagram_type):
-    # Get the package where you want to create the diagram
     package = repository.GetPackageByGuid(package_guid)
     if package:
-        # Create a new diagram under the specified package
         new_diagram = package.Diagrams.AddNew(diagram_name, diagram_type)
         if new_diagram:
-            # Update the diagram to apply changes
             new_diagram.Update()
             return new_diagram
     return None   
@@ -98,8 +95,13 @@ def create_document(repository, documents_package_GUID):
         repository, documents_package_GUID
     ) 
     
-    documentation_diagram=create_diagram(repository,documents_package_GUID,master_document.Name,"Documentation")
-
+    documentation_diagram = create_diagram(
+            repository,
+            master_document.PackageGUID,
+            "Documentation Diagram",
+            "Documentation"
+        )
+    
     if master_document is not None:
         if documentation_diagram is not None:
             i = 0
