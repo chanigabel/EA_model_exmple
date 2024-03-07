@@ -128,7 +128,7 @@ def create_document(repository, documents_package_GUID):
             repository.ShowInProjectView(master_document)
 
 #2
-def on_diagram_script():
+def main():
     ea = win32com.client.Dispatch("EA.App")
     repository = ea.Repository
 
@@ -141,4 +141,4 @@ def on_diagram_script():
         print("This script requires a package to be select")
 
 #1
-on_diagram_script()
+main()
