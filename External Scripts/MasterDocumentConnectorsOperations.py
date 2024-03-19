@@ -1,3 +1,7 @@
+#The script, written by Chany Jacobs, 
+#is designed to create a master document containing document models. 
+#This allows users to generate specific documentation about a package by dragging it into one of the models.
+
 import win32com.client
 # num - order of functions
 
