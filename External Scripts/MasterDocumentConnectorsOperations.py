@@ -135,7 +135,6 @@ def create_document(repository, documents_package_GUID):
 def main():
     ea = win32com.client.Dispatch("EA.App")
     repository = ea.Repository
-
     documents_package = repository.GetTreeSelectedPackage()
     if documents_package is not None:
         package_GUID = documents_package.PackageGUID
