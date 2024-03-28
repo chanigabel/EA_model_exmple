@@ -80,7 +80,7 @@ def suffix_form(selected_diagram, repository, flag):
     root.mainloop()
 
 def get_selected_diagram(ea_repos):
-    selected_diagram = ea_repos.GetCurrentDiagram()
+    selected_diagram = ea_repos.GetTreeSelectedObject()
     if selected_diagram is None:
         messagebox.showwarning("Warning", "Please select a diagram")
     return selected_diagram
