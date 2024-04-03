@@ -1,7 +1,3 @@
-#The script, written by Chany Jacobs, 
-#This script create new EA project model from the selected diagram packages with all it's hierarchy, 
-#apart from the selected diagram.
-
 import win32com.client
 import os
 
@@ -23,7 +19,7 @@ def if_package_exist(rep, package_name, list_package_guids):
     return False, None  # Return False and None if package not found
 
 def create_diagram_eap():
-    try:
+    # try:
         # Connect to Enterprise Architect
         ea = win32com.client.Dispatch("EA.App")
         rep = ea.Repository
@@ -77,18 +73,19 @@ def create_diagram_eap():
             if flag_if_package_exist:
                 rep.CreateModel(0, "C:/Temp/" + cur_diagram.Name + ".eap", 1)
                 print("EAP model created successfully.")
+                my_project = rep.GetProjectInterface()
                     # Further process the EAP model
-                create_eap_model("C:/Temp/" + cur_diagram.Name + ".eap", list_xmi_package, rep,my_project)
+                create_eap_model("C:/Temp/" + cur_diagram.Name + ".eap", list_xmi_package, rep, my_project)
             else:
                 print("No packages are found in the selected diagram.")
 
         else:
             print("Please select a diagram.")
 
-    except Exception as e:
-        print("An error occurred:", e)
+    # except Exception as e:
+    #     print("An error occurred:", e)
 
-def create_eap_model(project_path, list_xmi_package, rep,my_project):
+def create_eap_model(project_path, list_xmi_package, rep, my_project):
     try:
         rep.OpenFile(project_path)
 
@@ -131,7 +128,6 @@ def create_eap_model(project_path, list_xmi_package, rep,my_project):
     except Exception as e:
         print("An error occurred:", e)
 
-# Usage example
 def main():
     create_diagram_eap()
 
