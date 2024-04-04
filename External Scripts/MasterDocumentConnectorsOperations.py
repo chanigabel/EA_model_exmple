@@ -127,7 +127,16 @@ def create_document(repository, documents_package_GUID):
                 "Operation_tm",
             )
             i += 1
-            
+            add_model_document_for_diagram(
+                repository,
+                master_document,
+                documentation_diagram,
+               "Classifier Documentation",
+                i,
+                "Classifier_tm",
+            )
+            i += 1
+
             repository.RefreshModelView(master_document.PackageID)
             repository.ShowInProjectView(master_document)
 
