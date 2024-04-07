@@ -36,6 +36,7 @@ def apply_user_lock(rep, diagram_id, listbox_locked_elements, locked_elements):
 def main():
     ea = win32com.client.Dispatch("EA.App")
     rep = ea.Repository
+    selected_package = rep.GetTreeSelectedPackage()
 
     root = tk.Tk()
     root.title("Apply User Lock")
