@@ -2,12 +2,7 @@ import win32com.client
 import tkinter as tk
 from tkinter import messagebox
 
-def is_element_locked(element_guid, repository):
-    squery = "SELECT * FROM t_seclocks WHERE EntityID='" + element_guid + "'"
-    result = repository.SQLQuery(squery)
-    return len(result) > 0
-
-def apply_user_lock(rep, diagram_id, listbox_locked_elements, locked_elements):
+def lock_elements(rep, diagram_id, listbox_locked_elements, locked_elements):
     locked_elements.clear()
 
     diagram = rep.GetDiagramByID(diagram_id)
@@ -19,9 +14,16 @@ def apply_user_lock(rep, diagram_id, listbox_locked_elements, locked_elements):
         element = rep.GetElementByID(diagram_object.ElementID)
         if element is None:
             continue
-        
-        if is_element_locked(element.ElementGUID, rep):
+
+        # Check if the element is already locked
+        if element.Locked:
             locked_elements.append(element.Name)
+            # Skip updating the locked element
+        else:
+            # Apply user lock to the selected element
+            element.Locked = True
+            if rep.IsSecurityEnabled:
+                element.ApplyUserLock()
 
     # Display all locked elements in the listbox
     listbox_locked_elements.delete(0, tk.END)
@@ -29,9 +31,9 @@ def apply_user_lock(rep, diagram_id, listbox_locked_elements, locked_elements):
         listbox_locked_elements.insert(tk.END, element_name)
 
     if locked_elements:
-        messagebox.showinfo("Locked Elements", f"{len(locked_elements)} elements are locked.")
+        messagebox.showinfo("Locked Elements", f"{len(locked_elements)} elements are already locked.")
     else:
-        messagebox.showinfo("Done", "No elements are locked in this diagram.")
+        messagebox.showinfo("Done", "All eligible elements have been locked.")
 
 def main():
     ea = win32com.client.Dispatch("EA.App")
@@ -59,18 +61,18 @@ def main():
 
     locked_elements = []
 
-    def btnShowLockedElements_Click():
+    def btnLock_Click():
         selected_index = listbox_diagrams.curselection()
         if not selected_index:
             messagebox.showwarning("No Diagram Selected", "Please select a diagram.")
             return
 
         diagram_id = selected_package.Diagrams[selected_index[0]].DiagramID
-        apply_user_lock(rep, diagram_id, listbox_locked_elements, locked_elements)
+        lock_elements(rep, diagram_id, listbox_locked_elements, locked_elements)
 
-    # Button to show locked elements for the selected diagram
-    tk.Button(root, text="Show Locked Elements", 
-              command=btnShowLockedElements_Click(selected_package)).grid(row=2, column=0, columnspan=2)
+    # Button to lock elements for the selected diagram
+    tk.Button(root, text="Lock Elements", 
+              command=btnLock_Click).grid(row=2, column=0, columnspan=2)
 
     # Button to refresh the list of diagrams
     tk.Button(root, text="Refresh Diagrams", 
