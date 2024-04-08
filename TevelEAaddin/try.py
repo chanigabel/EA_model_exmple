@@ -1,110 +1,76 @@
 import win32com.client
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import ttk
+from tkinter import filedialog
 
-def lock_elements(rep, diagram_id, listbox_locked_elements, locked_elements, action):
-    locked_elements.clear()
-
-    diagram = rep.GetDiagramByID(diagram_id)
-    if diagram is None:
-        messagebox.showwarning("Diagram Not Found", f"No diagram with the ID '{diagram_id}' was found.")
+def search_for_duplicates(repository):
+    selected_package = repository.GetTreeSelectedPackage()
+    if not selected_package:
+        messagebox.showwarning("Package Not Found", "Please select a package for the duplicates search.")
         return
 
-    for diagram_object in diagram.DiagramObjects:
-        element = rep.GetElementByID(diagram_object.ElementID)
-        if element is None:
-            continue
+    duplicates_list = []
+    list_subpackages = [selected_package]
+    find_subpackages(selected_package, list_subpackages)
 
-        if action == "Lock":
-            # Check if the element is already locked
-            if element.Locked:
-                locked_elements.append(element.Name)
-                # Skip updating the locked element
-            else:
-                # Apply user lock to the selected element
-                element.Locked = True
-                if rep.IsSecurityEnabled:
-                    element.ApplyUserLock()
-        elif action == "Unlock":
-            # Check if the element is locked
-            if not element.Locked:
-                locked_elements.append(element.Name)
-                # Skip updating the unlocked element
-            else:
-                # Remove user lock from the selected element
-                element.Locked = False
-                if rep.IsSecurityEnabled:
-                    element.ApplyUserLock()
+    for cur_package in list_subpackages:
+        for cur_element in cur_package.Elements:
+            if cur_element.Type in ["Class", "Interface", "Enumeration"]:
+                list_duplicates = [p for p in cur_package.Elements if p.Name == cur_element.Name and p.Type == cur_element.Type]
+                if len(list_duplicates) > 1:
+                    package_name = repository.GetPackageByID(cur_element.PackageID).Name
+                    duplicates_list.append((cur_element.Name, cur_element.Type, package_name, cur_element.ElementID))
 
-    # Display all locked elements in the listbox
-    listbox_locked_elements.delete(0, tk.END)
-    for element_name in locked_elements:
-        listbox_locked_elements.insert(tk.END, element_name)
+    duplicates_search_window = tk.Tk()
+    duplicates_search_window.title("Search for Duplicates")
+    duplicates_search_window.geometry("800x600")
 
-    if locked_elements:
-        if action == "Lock":
-            messagebox.showinfo("Locked Elements", f"{len(locked_elements)} elements are already locked.")
-        elif action == "Unlock":
-            messagebox.showinfo("Unlocked Elements", f"{len(locked_elements)} elements are already unlocked.")
-    else:
-        if action == "Lock":
-            messagebox.showinfo("Done", "All eligible elements have been locked.")
-        elif action == "Unlock":
-            messagebox.showinfo("Done", "All eligible elements have been unlocked.")
+    tk.Label(duplicates_search_window, text="Element Name - Type - Package - ID").pack(padx=10, pady=5)
+
+    duplicates_listbox = tk.Listbox(duplicates_search_window)
+    duplicates_listbox.pack(expand=True, fill='both', padx=10, pady=10)
+
+    for name, element_type, package_name, element_id in duplicates_list:
+        item_text = f"{name} - {element_type} - {package_name} - {element_id}"
+        duplicates_listbox.insert(tk.END, item_text)
+
+    btn_open = ttk.Button(duplicates_search_window, text="Open", command=lambda: open_selected(repository, duplicates_listbox))
+    btn_open.pack(side=tk.RIGHT, padx=10, pady=5)
+
+    btn_close = ttk.Button(duplicates_search_window, text="Close", command=duplicates_search_window.destroy)
+    btn_close.pack(side=tk.RIGHT, padx=10, pady=5)
+
+    btn_save = ttk.Button(duplicates_search_window, text="Save to File", command=lambda: save_to_file(duplicates_list))
+    btn_save.pack(side=tk.RIGHT, padx=10, pady=5)
+
+    duplicates_search_window.mainloop()
+
+def find_subpackages(cur_package, list_subpackages):
+    for sub_package in cur_package.Packages:
+        if sub_package not in list_subpackages:
+            list_subpackages.append(sub_package)
+            find_subpackages(sub_package, list_subpackages)
+
+def open_selected(repository, listbox):
+    selected_index = listbox.curselection()
+    if selected_index:
+        selected_item = listbox.get(selected_index[0])
+        element_id = selected_item.split(" - ")[3]
+        element_com = repository.GetElementByID(int(element_id))  # Convert to COM object
+        repository.ShowInProjectView(element_com)  # Pass the COM object to ShowInProjectView
+
+def save_to_file(duplicates_list):
+    file_path = filedialog.asksaveasfilename(defaultextension=".txt")
+    if file_path:
+        with open(file_path, 'w') as file:
+            for name, element_type, package_name, _ in duplicates_list:
+                file.write(f"{name}, {element_type}, {package_name}\n")
 
 def main():
     ea = win32com.client.Dispatch("EA.App")
-    rep = ea.Repository
-    selected_package = rep.GetTreeSelectedPackage()
-
-    root = tk.Tk()
-    root.title("Apply User Lock")
-
-    # Function to retrieve and display diagrams in the selected package
-    def display_diagrams():
-        selected_package = rep.GetTreeSelectedPackage()
-        if selected_package is not None:
-            listbox_diagrams.delete(0, tk.END)
-            for diagram in selected_package.Diagrams:
-                listbox_diagrams.insert(tk.END, diagram.Name)
-
-    tk.Label(root, text="Select Diagram", font=("Arial", 12)).grid(row=0, column=0)
-    listbox_diagrams = tk.Listbox(root, selectmode=tk.SINGLE)
-    listbox_diagrams.grid(row=1, column=0)
-
-    tk.Label(root, text="Locked Elements", font=("Arial", 12)).grid(row=0, column=1)
-    listbox_locked_elements = tk.Listbox(root)
-    listbox_locked_elements.grid(row=1, column=1)
-
-    locked_elements = []
-
-    # Dropdown menu to select action
-    action_var = tk.StringVar(root)
-    action_var.set("Lock")  # Default action
-    action_menu = tk.OptionMenu(root, action_var, "Lock", "Unlock")
-    action_menu.grid(row=2, column=0)
-
-    def btnLock_Click():
-        selected_index = listbox_diagrams.curselection()
-        if not selected_index:
-            messagebox.showwarning("No Diagram Selected", "Please select a diagram.")
-            return
-
-        diagram_id = selected_package.Diagrams[selected_index[0]].DiagramID
-        action = action_var.get()
-        lock_elements(rep, diagram_id, listbox_locked_elements, locked_elements, action)
-
-    # Button to lock or unlock elements for the selected diagram
-    tk.Button(root, text="Apply Action", 
-              command=btnLock_Click).grid(row=2, column=1)
-
-    # Button to refresh the list of diagrams
-    tk.Button(root, text="Refresh Diagrams", 
-              command=display_diagrams).grid(row=3, column=0, columnspan=2)
-    
-    display_diagrams()  # Initial display of diagrams
-    
-    root.mainloop()
+    repository = ea.Repository
+    search_for_duplicates(repository)
 
 if __name__ == "__main__":
     main()

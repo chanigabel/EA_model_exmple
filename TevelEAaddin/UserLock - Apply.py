@@ -2,7 +2,7 @@ import win32com.client
 import tkinter as tk
 from tkinter import messagebox
 
-def lock_elements(rep, diagram_id, listbox_locked_elements, locked_elements):
+def lock_elements(rep, diagram_id, listbox_locked_elements, locked_elements, action):
     locked_elements.clear()
 
     diagram = rep.GetDiagramByID(diagram_id)
@@ -15,15 +15,26 @@ def lock_elements(rep, diagram_id, listbox_locked_elements, locked_elements):
         if element is None:
             continue
 
-        # Check if the element is already locked
-        if element.Locked:
-            locked_elements.append(element.Name)
-            # Skip updating the locked element
-        else:
-            # Apply user lock to the selected element
-            element.Locked = True
-            if rep.IsSecurityEnabled:
-                element.ApplyUserLock()
+        if action == "Lock":
+            # Check if the element is already locked
+            if element.Locked:
+                locked_elements.append(element.Name)
+                # Skip updating the locked element
+            else:
+                # Apply user lock to the selected element
+                element.Locked = True
+                if rep.IsSecurityEnabled:
+                    element.ApplyUserLock()
+        elif action == "Unlock":
+            # Check if the element is locked
+            if not element.Locked:
+                locked_elements.append(element.Name)
+                # Skip updating the unlocked element
+            else:
+                # Remove user lock from the selected element
+                element.Locked = False
+                if rep.IsSecurityEnabled:
+                    element.ApplyUserLock()
 
     # Display all locked elements in the listbox
     listbox_locked_elements.delete(0, tk.END)
@@ -31,9 +42,15 @@ def lock_elements(rep, diagram_id, listbox_locked_elements, locked_elements):
         listbox_locked_elements.insert(tk.END, element_name)
 
     if locked_elements:
-        messagebox.showinfo("Locked Elements", f"{len(locked_elements)} elements are already locked.")
+        if action == "Lock":
+            messagebox.showinfo("Locked Elements", f"{len(locked_elements)} elements are already locked.")
+        elif action == "Unlock":
+            messagebox.showinfo("Unlocked Elements", f"{len(locked_elements)} elements are already unlocked.")
     else:
-        messagebox.showinfo("Done", "All eligible elements have been locked.")
+        if action == "Lock":
+            messagebox.showinfo("Done", "All eligible elements have been locked.")
+        elif action == "Unlock":
+            messagebox.showinfo("Done", "All eligible elements have been unlocked.")
 
 def main():
     ea = win32com.client.Dispatch("EA.App")
@@ -61,6 +78,12 @@ def main():
 
     locked_elements = []
 
+    # Dropdown menu to select action
+    action_var = tk.StringVar(root)
+    action_var.set("Lock")  # Default action
+    action_menu = tk.OptionMenu(root, action_var, "Lock", "Unlock")
+    action_menu.grid(row=2, column=0)
+
     def btnLock_Click():
         selected_index = listbox_diagrams.curselection()
         if not selected_index:
@@ -68,11 +91,12 @@ def main():
             return
 
         diagram_id = selected_package.Diagrams[selected_index[0]].DiagramID
-        lock_elements(rep, diagram_id, listbox_locked_elements, locked_elements)
+        action = action_var.get()
+        lock_elements(rep, diagram_id, listbox_locked_elements, locked_elements, action)
 
-    # Button to lock elements for the selected diagram
-    tk.Button(root, text="Lock Elements", 
-              command=btnLock_Click).grid(row=2, column=0, columnspan=2)
+    # Button to lock or unlock elements for the selected diagram
+    tk.Button(root, text="Apply Action", 
+              command=btnLock_Click).grid(row=2, column=1)
 
     # Button to refresh the list of diagrams
     tk.Button(root, text="Refresh Diagrams", 
