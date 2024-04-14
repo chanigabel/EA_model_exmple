@@ -1,76 +1,101 @@
 import win32com.client
 import tkinter as tk
 from tkinter import messagebox
-from tkinter import ttk
-from tkinter import filedialog
+import xml.etree.ElementTree as ET
 
-def search_for_duplicates(repository):
-    selected_package = repository.GetTreeSelectedPackage()
-    if not selected_package:
-        messagebox.showwarning("Package Not Found", "Please select a package for the duplicates search.")
-        return
+def is_element_locked(element_guid, repository):
+    squery = "SELECT UserID FROM t_seclocks WHERE EntityID='" + element_guid + "'"
+    result = repository.SQLQuery(squery)
+    xml_root = ET.fromstring(result)
+    user = xml_root.find(".//UserID")
+    return user is not None
 
-    duplicates_list = []
-    list_subpackages = [selected_package]
-    find_subpackages(selected_package, list_subpackages)
+def update_author_dialog(rep):
+    if rep.IsSecurityEnabled:
+        dialog_result = messagebox.askyesno(
+            "Tevel EA Addin: Update author of Diagram Elements",
+            "This option opens the Update author dialog box which enables updating a author of the selected Diagram's elements which are not locked.\n\nWould you like to proceed?",
+            icon="warning"
+        )
+    else:
+        dialog_result = messagebox.askyesno(
+            "Tevel EA Addin: Update author of Diagram Elements",
+            "This option opens the Update author dialog box which enables updating a author of the selected Diagram's elements.\n\nWould you like to proceed?",
+            icon="warning"
+        )
+    
+    if dialog_result:
+        sel_Diagram = get_selected_Diagram(rep)
+        if sel_Diagram:
+            change_author(rep, sel_Diagram)
 
-    for cur_package in list_subpackages:
-        for cur_element in cur_package.Elements:
-            if cur_element.Type in ["Class", "Interface", "Enumeration"]:
-                list_duplicates = [p for p in cur_package.Elements if p.Name == cur_element.Name and p.Type == cur_element.Type]
-                if len(list_duplicates) > 1:
-                    package_name = repository.GetPackageByID(cur_element.PackageID).Name
-                    duplicates_list.append((cur_element.Name, cur_element.Type, package_name, cur_element.ElementID))
+def get_selected_Diagram(ea_repos):
+    selected_Diagram = ea_repos.GetCurrentDiagram()
+    if selected_Diagram is None:
+        messagebox.showwarning("Warning", "Please select a Diagram")
+    return selected_Diagram
 
-    duplicates_search_window = tk.Tk()
-    duplicates_search_window.title("Search for Duplicates")
-    duplicates_search_window.geometry("800x600")
+def change_author(rep, selected_Diagram):
 
-    tk.Label(duplicates_search_window, text="Element Name - Type - Package - ID").pack(padx=10, pady=5)
+    root = tk.Tk()
+    root.title("Update author")
 
-    duplicates_listbox = tk.Listbox(duplicates_search_window)
-    duplicates_listbox.pack(expand=True, fill='both', padx=10, pady=10)
+    label = tk.Label(root, text="Update the Author from:")
+    label.grid(row=0, column=0)
 
-    for name, element_type, package_name, element_id in duplicates_list:
-        item_text = f"{name} - {element_type} - {package_name} - {element_id}"
-        duplicates_listbox.insert(tk.END, item_text)
+    label = tk.Label(root, text="Update the Author to:")
+    label.grid(row=1, column=0)
 
-    btn_open = ttk.Button(duplicates_search_window, text="Open", command=lambda: open_selected(repository, duplicates_listbox))
-    btn_open.pack(side=tk.RIGHT, padx=10, pady=5)
+    txt_to_author = tk.Entry(root)
+    txt_to_author.grid(row=1, column=1)
 
-    btn_close = ttk.Button(duplicates_search_window, text="Close", command=duplicates_search_window.destroy)
-    btn_close.pack(side=tk.RIGHT, padx=10, pady=5)
+    txt_from_author = tk.Entry(root)
+    txt_from_author.grid(row=0, column=1)
 
-    btn_save = ttk.Button(duplicates_search_window, text="Save to File", command=lambda: save_to_file(duplicates_list))
-    btn_save.pack(side=tk.RIGHT, padx=10, pady=5)
+    btn_update = tk.Button(root, text="Update", command=lambda: on_update_click_author(rep, selected_Diagram, txt_to_author.get(), txt_from_author.get(), root))
+    btn_update.grid(row=3, column=1)
 
-    duplicates_search_window.mainloop()
+    root.mainloop()
 
-def find_subpackages(cur_package, list_subpackages):
-    for sub_package in cur_package.Packages:
-        if sub_package not in list_subpackages:
-            list_subpackages.append(sub_package)
-            find_subpackages(sub_package, list_subpackages)
+def get_all_links_in_current_diagram(rep, selected_Diagram):
+    squery = f"SELECT PDATA1 FROM t_object INNER JOIN t_diagramobjects ON t_object.Object_ID = t_diagramobjects.Object_ID WHERE t_diagramobjects.Diagram_ID = {int(selected_Diagram.DiagramID)} AND PDATA1 IS NOT NULL"
+    result = ET.ElementTree(ET.fromstring(rep.SQLQuery(squery)))
+    root = result.getroot()
+    pdata1_values = [element.text for element in root.findall(".//PDATA1")]
+    return [pdata1_values]
 
-def open_selected(repository, listbox):
-    selected_index = listbox.curselection()
-    if selected_index:
-        selected_item = listbox.get(selected_index[0])
-        element_id = selected_item.split(" - ")[3]
-        element_com = repository.GetElementByID(int(element_id))  # Convert to COM object
-        repository.ShowInProjectView(element_com)  # Pass the COM object to ShowInProjectView
+def on_update_click_author(rep, selected_Diagram, txt_to_author, txt_from_author, root):
+    pdata1_values = get_all_links_in_current_diagram(rep, selected_Diagram)
+    update_author(rep, selected_Diagram, txt_to_author, txt_from_author, root, pdata1_values)
 
-def save_to_file(duplicates_list):
-    file_path = filedialog.asksaveasfilename(defaultextension=".txt")
-    if file_path:
-        with open(file_path, 'w') as file:
-            for name, element_type, package_name, _ in duplicates_list:
-                file.write(f"{name}, {element_type}, {package_name}\n")
+def update_author(rep, selected_Diagram, txt_to_author, txt_from_author, root, pdata1_values):
+ 
+    for cur_object in selected_Diagram.DiagramObjects:
+        cur_element = rep.GetElementByID(cur_object.ElementID)
+        if cur_element.Author == txt_from_author:
+            if rep.IsSecurityEnabled:
+                if not is_element_locked(cur_element.ElementGUID, rep):
+                    cur_element.ApplyUserLock()
+                    cur_element.Author = txt_to_author
+                    cur_element.Update()
+            else:
+                cur_element.Author = txt_to_author
+                cur_element.Update()
+
+    for cur_PDATA1 in pdata1_values[0]:
+        if int(cur_PDATA1) > 0:
+            linked_diagram = rep.GetDiagramByID(int(cur_PDATA1))
+            linked_diagram.Author = txt_to_author
+            linked_diagram.Update()
+            messagebox.showinfo("Info", f"{linked_diagram.Name} Diagram author updated successfully!")
+
+    
+    root.destroy()
 
 def main():
     ea = win32com.client.Dispatch("EA.App")
-    repository = ea.Repository
-    search_for_duplicates(repository)
+    rep = ea.Repository
+    update_author_dialog(rep)
 
 if __name__ == "__main__":
     main()

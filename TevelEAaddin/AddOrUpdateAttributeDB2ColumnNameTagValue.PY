@@ -1,7 +1,6 @@
 import win32com.client
 from tkinter import messagebox
 
-
 def create_uppercase_table_name(table_name):
     substr = ""
     for char in table_name:
