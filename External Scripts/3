@@ -1,0 +1,55 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+	<Package Name="EAAddInInstaller-32bit" Manufacturer="TODO Manufacturer" Version="1.0.0.0" UpgradeCode="8045fa12-b7c7-437b-81c7-f8cacf41a9ca">
+		<MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+
+		<Feature Id="MainFeature" Title="Main Feature" Level="1">
+			<ComponentGroupRef Id="MyAddinComponents" />
+		</Feature>
+	</Package>
+
+	<Fragment>
+		<!-- Define your root directory -->
+		<Directory Id="INSTALLFOLDER" Name="MyEAAddin">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLDIR" Name="MyEAAddin" />
+			</Directory>
+		</Directory>
+
+		<ComponentGroup Id="MyAddinComponents">
+			<Component Id="MyAddinComponent" Guid="{06A042F5-439A-44D1-8856-8EDA02D8497A}">
+				<File Source="MyAddin.dll" KeyPath="no" />
+				<!-- Update the existing registry value -->
+				<RegistryValue Root="HKCU" Key="Software\Sparx Systems\EAAddins\MyAddin"  Value="MyAddin.MyAddinClass"  Action="write" />
+
+				<RegistryValue Root="HKLM" Key="SOFTWARE\Classes\MyAddin.MyAddinClass" Value="MyAddin.MyAddinClass"  Action="write"/>
+
+				<RegistryValue Root="HKLM" Key="SOFTWARE\Classes\MyAddin.MyAddinClass\CLSID" Value="{10BC65F1-32C0-3ED4-98A0-17661A8C4455}"  Action="write"/>
+
+				<RegistryValue Root="HKCR" Key="WOW6432Node\CLSID\{10BC65F1-32C0-3ED4-98A0-17661A8C4455}" Value="MyAddin.MyAddinClass"  Action="write"/>
+				
+				<RegistryKey Root="HKCR" Key="WOW6432Node\CLSID\{10BC65F1-32C0-3ED4-98A0-17661A8C4455}\Implemented Categories\{62C8FE65-4EBB-45e7-B440-6E39B2CDBF29}"/>
+
+				<RegistryKey Root="HKCR" Key="WOW6432Node\CLSID\{10BC65F1-32C0-3ED4-98A0-17661A8C4455}\InprocServer32">
+					<RegistryValue Name="Assembly" Type="string" Value="MyAddin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+					<RegistryValue Name="Class" Type="string" Value="MyAddin.MyAddinClass" />
+					<RegistryValue Name="CodeBase" Type="string" Value="file:///[INSTALLDIR]MyAddin.dll" />
+					<RegistryValue Name="RuntimeVersion" Type="string" Value="v4.0.30319" />
+					<RegistryValue Name="ThreadingModel" Type="string" Value="Both" />
+				</RegistryKey>
+
+				<RegistryValue Root="HKCR" Key="WOW6432Node\CLSID\{10BC65F1-32C0-3ED4-98A0-17661A8C4455}\InprocServer32" Value="mscoree.dll" Action="write"/>
+
+				<RegistryKey Root="HKCR" Key="WOW6432Node\CLSID\{10BC65F1-32C0-3ED4-98A0-17661A8C4455}\InprocServer32\1.0.0.0">
+					<RegistryValue Name="Assembly" Type="string" Value="MyAddin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+					<RegistryValue Name="Class" Type="string" Value="MyAddin.MyAddinClass" />
+					<RegistryValue Name="CodeBase" Type="string" Value="file:///[INSTALLDIR]MyAddin.dll" />
+					<RegistryValue Name="RuntimeVersion" Type="string" Value="v4.0.30319" />
+				</RegistryKey>
+
+				<RegistryValue Root="HKCR" Key="WOW6432Node\CLSID\{10BC65F1-32C0-3ED4-98A0-17661A8C4455}\ProgId" Value="MyAddin.MyAddinClass" Action="write"/>
+
+
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+</Wix>
