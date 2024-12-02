@@ -1,0 +1,222 @@
+rs/ch058/OneDrive/שולחן העבודה/EA_GIT/External Scripts/Charts.py"
+Chart Name: Bar Chart
+Chart Type: Class
+Custom SQL Query:
+        SELECT
+            t_object.Name AS X,
+            COUNT(t_connector.Connector_ID) AS Y
+        FROM
+            t_object
+        LEFT JOIN
+            t_connector ON t_connector.Start_Object_ID = t_object.Object_ID
+        WHERE
+            t_object.Package_ID = 214
+        GROUP BY
+            t_object.Name
+
+
+Available properties and values in the chart element:
+Abstract: 0
+ActionFlags:
+AddRef: <bound method AddRef of <COMObject AddNew>>
+Alias:
+ApplyGroupLock: <bound method ApplyGroupLock of <COMObject AddNew>>
+ApplyUserLock: <bound method ApplyUserLock of <COMObject AddNew>>
+AssociationClassConnectorID: 0
+Attributes: <COMObject <unknown>>
+AttributesEx: <COMObject <unknown>>
+Author: ch058
+BaseClasses: <COMObject <unknown>>
+ClassfierID: 0
+ClassifierID: 0
+ClassifierName:
+ClassifierType:
+Clone: <bound method Clone of <COMObject AddNew>>
+Complexity: 1
+CompositeDiagram: None
+Connectors: <COMObject <unknown>>
+Constraints: <COMObject <unknown>>
+ConstraintsEx: <COMObject <unknown>>
+CreateAssociationClass: <bound method CreateAssociationClass of <COMObject AddNew>>
+Created: 2024-10-31 18:22:48+00:00
+CustomProperties: <COMObject <unknown>>
+DeleteLinkedDocument: <bound method DeleteLinkedDocument of <COMObject AddNew>>
+Diagrams: <COMObject <unknown>>
+Difficulty:
+Efforts: <COMObject <unknown>>
+ElementGUID: {76C543A9-27B6-458d-AB6D-789BD04B0554}
+ElementID: 1506
+Elements: <COMObject <unknown>>
+EmbeddedElements: <COMObject <unknown>>
+EventFlags:
+ExportInternalDocumentArtifact: <bound method ExportInternalDocumentArtifact of <COMObject AddNew>>
+ExtensionPoints:
+FQName: Requirements.Bar Chart
+FQStereotype: EAUML::Chart
+Files: <COMObject <unknown>>
+Genfile:
+Genlinks:
+Gentype: Java
+GetBusinessRules: <bound method GetBusinessRules of <COMObject AddNew>>
+GetChart: <bound method GetChart of <COMObject AddNew>>
+GetDecisionTable: <bound method GetDecisionTable of <COMObject AddNew>>
+GetElementGrid: <bound method GetElementGrid of <COMObject AddNew>>
+GetIDsOfNames: <bound method GetIDsOfNames of <COMObject AddNew>>
+GetLastError: <bound method GetLastError of <COMObject AddNew>>
+GetLinkedDocument: <bound method GetLinkedDocument of <COMObject AddNew>>
+GetRelationSet: <bound method GetRelationSet of <COMObject AddNew>>
+GetStereotypeList: <bound method GetStereotypeList of <COMObject AddNew>>
+GetTXAlias: <bound method GetTXAlias of <COMObject AddNew>>
+GetTXName: <bound method GetTXName of <COMObject AddNew>>
+GetTXNote: <bound method GetTXNote of <COMObject AddNew>>
+GetTypeInfo: <bound method GetTypeInfo of <COMObject AddNew>>
+GetTypeInfoCount: <bound method GetTypeInfoCount of <COMObject AddNew>>
+HasStereotype: <bound method HasStereotype of <COMObject AddNew>>
+Header1:
+Header2:
+ImportInternalDocumentArtifact: <bound method ImportInternalDocumentArtifact of <COMObject AddNew>>
+Invoke: <bound method Invoke of <COMObject AddNew>>
+IsActive: False
+IsAssociationClass: <bound method IsAssociationClass of <COMObject AddNew>>
+IsComposite: False
+IsInternalDocArtifact: False
+IsLeaf: False
+IsNew: True
+IsRoot: False
+IsSpec: False
+Issues: <COMObject <unknown>>
+LoadLinkedDocument: <bound method LoadLinkedDocument of <COMObject AddNew>>
+Locked: False
+MetaType: StandardChart
+Methods: <COMObject <unknown>>
+MethodsEx: <COMObject <unknown>>
+Metrics: <COMObject <unknown>>
+MiscData: <bound method MiscData of <COMObject AddNew>>
+Modified: 2024-10-31 18:22:48+00:00
+Multiplicity:
+Name: Bar Chart
+Notes:
+        SELECT
+            t_object.Name AS X,
+            COUNT(t_connector.Connector_ID) AS Y
+        FROM
+            t_object
+        LEFT JOIN
+            t_connector ON t_connector.Start_Object_ID = t_object.Object_ID
+        WHERE
+            t_object.Package_ID = 214
+        GROUP BY
+            t_object.Name
+
+ObjectType: 4
+PackageID: 214
+ParentID: 0
+Partitions: <COMObject <unknown>>
+Persistence:
+Phase: 1.0
+Priority:
+Properties: <Error accessing property>
+PropertyType: 0
+PropertyTypeName:
+QueryInterface: <bound method QueryInterface of <COMObject AddNew>>
+Realizes: <COMObject <unknown>>
+Refresh: <bound method Refresh of <COMObject AddNew>>
+Release: <bound method Release of <COMObject AddNew>>
+ReleaseUserLock: <bound method ReleaseUserLock of <COMObject AddNew>>
+Requirements: <COMObject <unknown>>
+RequirementsEx: <COMObject <unknown>>
+Resources: <COMObject <unknown>>
+Risks: <COMObject <unknown>>
+RunState:
+SaveLinkedDocument: <bound method SaveLinkedDocument of <COMObject AddNew>>
+Scenarios: <COMObject <unknown>>
+SetAppearance: <bound method SetAppearance of <COMObject AddNew>>
+SetCompositeDiagram: <bound method SetCompositeDiagram of <COMObject AddNew>>
+SetTXAlias: <bound method SetTXAlias of <COMObject AddNew>>
+SetTXName: <bound method SetTXName of <COMObject AddNew>>
+SetTXNote: <bound method SetTXNote of <COMObject AddNew>>
+StateTransitions: <COMObject <unknown>>
+Status: Proposed
+Stereotype: Chart
+StereotypeEx: Chart
+StyleEx:
+Subtype: 0
+SynchConstraints: <bound method SynchConstraints of <COMObject AddNew>>
+SynchTaggedValues: <bound method SynchTaggedValues of <COMObject AddNew>>
+Tablespace:
+Tag:
+TaggedValues: <COMObject <unknown>>
+TaggedValuesEx: <COMObject <unknown>>
+TemplateParameters: <COMObject <unknown>>
+Tests: <COMObject <unknown>>
+TreePos: 0
+Type: Class
+TypeInfoProperties: None
+UnlinkFromAssociation: <bound method UnlinkFromAssociation of <COMObject AddNew>>
+Update: <bound method Update of <COMObject AddNew>>
+Version: 1.0
+Visibility: Public
+_ApplyTypes_: <bound method CDispatch._ApplyTypes_ of <COMObject AddNew>>
+_FlagAsMethod: <bound method CDispatch._FlagAsMethod of <COMObject AddNew>>
+_LazyAddAttr_: <bound method CDispatch._LazyAddAttr_ of <COMObject AddNew>>
+_NewEnum: <bound method CDispatch._NewEnum of <COMObject AddNew>>
+_Release_: <bound method CDispatch._Release_ of <COMObject AddNew>>
+_UpdateWithITypeInfo_: <bound method CDispatch._UpdateWithITypeInfo_ of <COMObject AddNew>>
+__AttrToID__: <bound method CDispatch.__AttrToID__ of <COMObject AddNew>>
+__LazyMap__: <bound method CDispatch.__LazyMap__ of <COMObject AddNew>>
+__bool__: <bound method CDispatch.__bool__ of <COMObject AddNew>>
+__call__: <bound method CDispatch.__call__ of <COMObject AddNew>>
+__class__: <class 'win32com.client.CDispatch'>
+__delattr__: <method-wrapper '__delattr__' of CDispatch object at 0x0000025A86D922D0>
+__dict__: {'_oleobj_': <PyIDispatch at 0x0000025A844FF720 with obj at 0x0000025A8447BBB8>, '_username_': 'AddNew', '_olerepr_': <win32com.client.build.LazyDispatchItem object at 0x0000025A86D92C50>, '_mapCachedItems_': {}, '_builtMethods_': {'Update': <function Update at 0x0000025A86D94040>, 'AddRef': <function AddRef at 0x0000025A86D94360>, 'ApplyGroupLock': <function ApplyGroupLock at 0x0000025A86D94400>, 'ApplyUserLock': <function ApplyUserLock at 0x0000025A86D944A0>, 'Clone': <function Clone at 0x0000025A86D94540>, 'CreateAssociationClass': <function CreateAssociationClass at 0x0000025A86D945E0>, 'DeleteLinkedDocument': <function DeleteLinkedDocument at 0x0000025A86DE6520>, 'ExportInternalDocumentArtifact': <function ExportInternalDocumentArtifact at 0x0000025A86DE6160>, 'GetBusinessRules': <function GetBusinessRules at 0x0000025A86DE65C0>, 'GetChart': <function GetChart at 0x0000025A86DE6660>, 'GetDecisionTable': <function GetDecisionTable at 0x0000025A86DE6700>, 'GetElementGrid': <function GetElementGrid at 0x0000025A86DE67A0>, 'GetIDsOfNames': <function GetIDsOfNames at 0x0000025A86DE6840>, 'GetLastError': <function GetLastError at 0x0000025A86DE68E0>, 'GetLinkedDocument': <function GetLinkedDocument at 0x0000025A86DE6980>, 'GetRelationSet': <function GetRelationSet at 0x0000025A86DE6AC0>, 'GetStereotypeList': <function GetStereotypeList at 0x0000025A86DE6A20>, 'GetTXAlias': <function GetTXAlias at 0x0000025A86DE6B60>, 'GetTXName': <function GetTXName at 0x0000025A86DE6C00>, 'GetTXNote': <function GetTXNote at 0x0000025A86DE6CA0>, 'GetTypeInfo': <function GetTypeInfo at 0x0000025A86DE6DE0>, 'GetTypeInfoCount': <function GetTypeInfoCount at 0x0000025A86DE6E80>, 'HasStereotype': <function HasStereotype at 0x0000025A86DE6D40>, 'ImportInternalDocumentArtifact': <function ImportInternalDocumentArtifact at 0x0000025A86DE6F20>, 'Invoke': <function Invoke at 0x0000025A86DE6FC0>, 'IsAssociationClass': <function IsAssociationClass at 0x0000025A86DE7060>, 'LoadLinkedDocument': <function LoadLinkedDocument at 0x0000025A86DE7100>, 'MiscData': <function MiscData at 0x0000025A86DE7240>, 'QueryInterface': <function QueryInterface at 0x0000025A86DE71A0>, 'Refresh': <function Refresh at 0x0000025A86DE72E0>, 'Release': <function Release at 0x0000025A86DE7380>, 'ReleaseUserLock': <function ReleaseUserLock at 0x0000025A86DE7420>, 'SaveLinkedDocument': <function SaveLinkedDocument at 0x0000025A86DE74C0>, 'SetAppearance': <function SetAppearance at 0x0000025A86DE76A0>, 'SetCompositeDiagram': <function SetCompositeDiagram at 0x0000025A86DE7560>, 'SetTXAlias': <function SetTXAlias at 0x0000025A86DE7740>, 'SetTXName': <function SetTXName at 0x0000025A86DE77E0>, 'SetTXNote': <function SetTXNote at 0x0000025A86DE7880>, 'SynchConstraints': <function SynchConstraints at 0x0000025A86DE7920>, 'SynchTaggedValues': <function SynchTaggedValues at 0x0000025A86DE79C0>, 'UnlinkFromAssociation': <function UnlinkFromAssociation at 0x0000025A86DE7600>}, '_enum_': None, '_unicode_to_string_': None, '_lazydata_': (<PyITypeInfo at 0x0000025A844FF5C0 with obj at 0x0000025A8447BC28>, <PyITypeComp at 0x0000025A844FF480 with obj at 0x0000025A8447BC98>)}
+__dir__: <bound method CDispatch.__dir__ of <COMObject AddNew>>
+__doc__:
+    The dynamic class used as a last resort.
+    The purpose of this overriding of dynamic.CDispatch is to perpetuate the policy
+    of using the makepy generated wrapper Python class instead of dynamic.CDispatch
+    if/when possible.
+
+__eq__: <bound method CDispatch.__eq__ of <COMObject AddNew>>
+__format__: <built-in method __format__ of CDispatch object at 0x0000025A86D922D0>
+__ge__: <method-wrapper '__ge__' of CDispatch object at 0x0000025A86D922D0>
+__getattr__: <bound method CDispatch.__getattr__ of <COMObject AddNew>>
+__getattribute__: <method-wrapper '__getattribute__' of CDispatch object at 0x0000025A86D922D0>
+__getitem__: <bound method CDispatch.__getitem__ of <COMObject AddNew>>
+__getstate__: <built-in method __getstate__ of CDispatch object at 0x0000025A86D922D0>
+__gt__: <method-wrapper '__gt__' of CDispatch object at 0x0000025A86D922D0>
+__hash__: None
+__init__: <bound method CDispatch.__init__ of <COMObject AddNew>>
+__init_subclass__: <built-in method __init_subclass__ of type object at 0x0000025A86ACBF20>
+__int__: <bound method CDispatch.__int__ of <COMObject AddNew>>
+__le__: <method-wrapper '__le__' of CDispatch object at 0x0000025A86D922D0>
+__len__: <bound method CDispatch.__len__ of <COMObject AddNew>>
+__lt__: <method-wrapper '__lt__' of CDispatch object at 0x0000025A86D922D0>
+__module__: win32com.client
+__ne__: <bound method CDispatch.__ne__ of <COMObject AddNew>>
+__new__: <built-in method __new__ of type object at 0x00007FF937F10E30>
+__reduce__: <built-in method __reduce__ of CDispatch object at 0x0000025A86D922D0>
+__reduce_ex__: <built-in method __reduce_ex__ of CDispatch object at 0x0000025A86D922D0>
+__repr__: <bound method CDispatch.__repr__ of <COMObject AddNew>>
+__setattr__: <bound method CDispatch.__setattr__ of <COMObject AddNew>>
+__setitem__: <bound method CDispatch.__setitem__ of <COMObject AddNew>>
+__sizeof__: <built-in method __sizeof__ of CDispatch object at 0x0000025A86D922D0>
+__str__: <bound method CDispatch.__str__ of <COMObject AddNew>>
+__subclasshook__: <built-in method __subclasshook__ of type object at 0x0000025A86ACBF20>
+__weakref__: None
+_builtMethods_: {'Update': <function Update at 0x0000025A86D94040>, 'AddRef': <function AddRef at 0x0000025A86D94360>, 'ApplyGroupLock': <function ApplyGroupLock at 0x0000025A86D94400>, 'ApplyUserLock': <function ApplyUserLock at 0x0000025A86D944A0>, 'Clone': <function Clone at 0x0000025A86D94540>, 'CreateAssociationClass': <function CreateAssociationClass at 0x0000025A86D945E0>, 'DeleteLinkedDocument': <function DeleteLinkedDocument at 0x0000025A86DE6520>, 'ExportInternalDocumentArtifact': <function ExportInternalDocumentArtifact at 0x0000025A86DE6160>, 'GetBusinessRules': <function GetBusinessRules at 0x0000025A86DE65C0>, 'GetChart': <function GetChart at 0x0000025A86DE6660>, 'GetDecisionTable': <function GetDecisionTable at 0x0000025A86DE6700>, 'GetElementGrid': <function GetElementGrid at 0x0000025A86DE67A0>, 'GetIDsOfNames': <function GetIDsOfNames at 0x0000025A86DE6840>, 'GetLastError': <function GetLastError at 0x0000025A86DE68E0>, 'GetLinkedDocument': <function GetLinkedDocument at 0x0000025A86DE6980>, 'GetRelationSet': <function GetRelationSet at 0x0000025A86DE6AC0>, 'GetStereotypeList': <function GetStereotypeList at 0x0000025A86DE6A20>, 'GetTXAlias': <function GetTXAlias at 0x0000025A86DE6B60>, 'GetTXName': <function GetTXName at 0x0000025A86DE6C00>, 'GetTXNote': <function GetTXNote at 0x0000025A86DE6CA0>, 'GetTypeInfo': <function GetTypeInfo at 0x0000025A86DE6DE0>, 'GetTypeInfoCount': <function GetTypeInfoCount at 0x0000025A86DE6E80>, 'HasStereotype': <function HasStereotype at 0x0000025A86DE6D40>, 'ImportInternalDocumentArtifact': <function ImportInternalDocumentArtifact at 0x0000025A86DE6F20>, 'Invoke': <function Invoke at 0x0000025A86DE6FC0>, 'IsAssociationClass': <function IsAssociationClass at 0x0000025A86DE7060>, 'LoadLinkedDocument': <function LoadLinkedDocument at 0x0000025A86DE7100>, 'MiscData': <function MiscData at 0x0000025A86DE7240>, 'QueryInterface': <function QueryInterface at 0x0000025A86DE71A0>, 'Refresh': <function Refresh at 0x0000025A86DE72E0>, 'Release': <function Release at 0x0000025A86DE7380>, 'ReleaseUserLock': <function ReleaseUserLock at 0x0000025A86DE7420>, 'SaveLinkedDocument': <function SaveLinkedDocument at 0x0000025A86DE74C0>, 'SetAppearance': <function SetAppearance at 0x0000025A86DE76A0>, 'SetCompositeDiagram': <function SetCompositeDiagram at 0x0000025A86DE7560>, 'SetTXAlias': <function SetTXAlias at 0x0000025A86DE7740>, 'SetTXName': <function SetTXName at 0x0000025A86DE77E0>, 'SetTXNote': <function SetTXNote at 0x0000025A86DE7880>, 'SynchConstraints': <function SynchConstraints at 0x0000025A86DE7920>, 'SynchTaggedValues': <function SynchTaggedValues at 0x0000025A86DE79C0>, 'UnlinkFromAssociation': <function UnlinkFromAssociation at 0x0000025A86DE7600>}
+_dir_ole_: <bound method CDispatch._dir_ole_ of <COMObject AddNew>>
+_enum_: None
+_find_dispatch_type_: <bound method CDispatch._find_dispatch_type_ of <COMObject AddNew>>
+_get_good_object_: <bound method CDispatch._get_good_object_ of <COMObject AddNew>>
+_get_good_single_object_: <bound method CDispatch._get_good_single_object_ of <COMObject AddNew>>
+_lazydata_: (<PyITypeInfo at 0x0000025A844FF5C0 with obj at 0x0000025A8447BC28>, <PyITypeComp at 0x0000025A844FF480 with obj at 0x0000025A8447BC98>)
+_make_method_: <bound method CDispatch._make_method_ of <COMObject AddNew>>
+_mapCachedItems_: {}
+_oleobj_: <PyIDispatch at 0x0000025A844FF720 with obj at 0x0000025A8447BBB8>
+_olerepr_: <win32com.client.build.LazyDispatchItem object at 0x0000025A86D92C50>
+_print_details_: <bound method CDispatch._print_details_ of <COMObject AddNew>>
+_proc_: <bound method CDispatch._proc_ of <COMObject AddNew>>
+_unicode_to_string_: None
+_username_: AddNew
+_wrap_dispatch_: <bound method CDispatch._wrap_dispatch_ of <COMObject AddNew>>
+PS C:\Users\ch058\OneDrive\שולחן העבודה\EA_GIT\External Scripts>

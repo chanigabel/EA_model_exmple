@@ -1,0 +1,200 @@
+Option Explicit
+
+!INC Local Scripts.EAConstants-VBScript
+
+' Script Name: DeleteTaggedValue-ElementsPackagesMethodsAttributes
+' Author: Chani Jacobs
+' Purpose: Delete tagged values {some->1/2/3:1/2/3} from elements, methods, attributes, and packages in the selected package (optionally sub-packages).
+' Date: 2024-11-25, Changed in 25/11/24 by Chani Jacobs. - Added delete from methods and attributes and packages.
+' Changed in 26/11/24 by Chani Jacobs. - Divided "ids" to "Pids" and "Eids", Added " ' " & to the GUIDs list, 
+' Changed the message before and the listValue to empty list.
+' Helper function to check if a value is in an array
+Function IsInArray(val, arr)
+    Dim i
+    For i = LBound(arr) To UBound(arr)
+        If arr(i) = val Then
+            IsInArray = True
+            Exit Function
+        End If
+    Next
+    IsInArray = False
+End Function
+
+' Function to execute SQL deletion
+Sub deleteTagValues(repository, Pids, Eids, AGUIDs,OGUIDs)
+    On Error Resume Next
+    Dim sql
+    If Pids <> "" Then
+        sql = "DELETE FROM t_objectproperties WHERE PropertyID IN (" & Pids & ")"
+        repository.Execute sql
+    End If
+	If Eids <> "" Then
+        sql = "DELETE FROM t_objectproperties WHERE PropertyID IN (" & Eids & ")"
+        repository.Execute sql
+    End If
+	If AGUIDs <> "" Then
+        sql = "DELETE FROM t_attributetag WHERE ea_guid IN (" & AGUIDs & ")"
+        repository.Execute sql
+    End If
+	If OGUIDs <> "" Then
+        sql = "DELETE FROM t_operationtag WHERE ea_guid IN (" & OGUIDs & ")"
+        repository.Execute sql
+    End If
+    On Error GoTo 0
+End Sub
+
+' Function to process packages, elements, operations, and attributes
+Sub ManageElements(thePackage, listName, listValue)
+
+    If Not thePackage Is Nothing And thePackage.ParentID <> 0 Then
+        Dim i, testElementID
+
+        Session.Output("SCRIPT DELETE TAGGEDVALUES")
+        Session.Output("=======================================")
+        Session.Output("Working on package '" & thePackage.Name & "' (ID=" & thePackage.PackageID & ")")
+
+        Dim elements As EA.Collection
+        Set elements = thePackage.Elements
+        Dim Pids
+
+        ' Check tagged values on the package itself
+        If thePackage.Element.TaggedValues.Count > 0 Then
+            Session.Output("Processing package-level tagged values for: " & thePackage.Name)
+            Dim taggedValue As EA.TaggedValue
+            For Each taggedValue In thePackage.Element.TaggedValues
+                Session.Output(taggedValue.Name & ": " & taggedValue.Value)
+                ' If taggedValue=1/2/3:1/2/3, add to delete list - ids
+                If (IsInArray(taggedValue.Name, listName)) And (IsInArray(taggedValue.Value, listValue)) Then
+                    If Pids <> "" Then
+                        Pids = Pids & ", "
+                    End If
+                    Pids = Pids & taggedValue.PropertyID
+                End If
+            Next
+        End If
+
+        Dim Eids
+        ' Navigate the elements collection
+        For i = 0 To elements.Count - 1
+            Dim currentElement As EA.Element
+            Set currentElement = elements.GetAt(i)
+
+            ' If the element has TaggedValues, then delete {some->1/2/3:1/2/3}
+            If currentElement.TaggedValues.Count > 0 Then
+                Session.Output("Element: " & currentElement.Name)
+                Session.Output("TaggedValues:")
+                For Each taggedValue In currentElement.TaggedValues
+                    Session.Output(taggedValue.Name & ": " & taggedValue.Value)
+                    ' If taggedValue=1/2/3:1/2/3 then add to delete list - ids
+                    If (IsInArray(taggedValue.Name, listName)) And (IsInArray(taggedValue.Value, listValue)) Then
+                        If Eids <> "" Then
+                            Eids = Eids & ", "
+                        End If
+                        Eids = Eids & taggedValue.PropertyID
+                    End If
+                Next
+            End If
+
+			Dim AGUIDs
+            ' Check attributes for tagged values
+            Dim attribute As EA.Attribute
+            For Each attribute In currentElement.Attributes
+                If attribute.TaggedValues.Count > 0 Then
+                    Session.Output("Attribute: " & attribute.Name)
+                    For Each taggedValue In attribute.TaggedValues
+                        Session.Output(taggedValue.Name & ": " & taggedValue.Value)
+                        If (IsInArray(taggedValue.Name, listName)) And (IsInArray(taggedValue.Value, listValue)) Then
+                            If AGUIDs <> "" Then
+                                AGUIDs = AGUIDs & ", "
+                            End If
+							Session.Output("taggedValueGUID: " & taggedValue.TagGUID)
+                            AGUIDs = AGUIDs & "'" & taggedValue.TagGUID & "'" 
+                        End If
+                    Next
+                End If
+            Next
+			  
+			  ' Check operations (methods) for tagged values
+			Dim OGUIDs
+            Dim operation As EA.Method
+            For Each operation In currentElement.Methods
+                If operation.TaggedValues.Count > 0 Then
+                    Session.Output("Operation: " & operation.Name)
+                    For Each taggedValue In operation.TaggedValues
+                        Session.Output(taggedValue.Name & ": " & taggedValue.Value)
+                        If (IsInArray(taggedValue.Name, listName)) And (IsInArray(taggedValue.Value, listValue)) Then
+                            If OGUIDs <> "" Then
+                                OGUIDs = OGUIDs & ", "
+                            End If
+                            OGUIDs = OGUIDs & "'" & taggedValue.TagGUID & "'" 
+                        End If
+                    Next
+                End If
+            Next
+        Next
+		
+			
+        ' Process sub-packages recursively
+        Dim subPackage
+        For Each subPackage In thePackage.Packages
+            ManageElements subPackage, listName, listValue
+        Next
+
+        'delete all in the list -> deleteTagValues
+        
+        deleteTagValues Repository, Pids, Eids, AGUIDs, OGUIDs
+        
+
+        Session.Output("Done processing package: " & thePackage.Name)
+    Else
+        ' No package selected in the tree
+        MsgBox("This script requires a package to be selected in the Project Browser." & vbCrLf & _
+            "Please select a package in the Project Browser and try again.")
+    End If
+
+End Sub
+
+' Main script function
+sub OnProjectBrowserScript()
+
+    ' Get the type of element selected in the Project Browser
+    dim treeSelectedType, continueProcess
+    treeSelectedType = Repository.GetTreeSelectedItemType()
+
+	' Define the lists for taggedValue.Name and taggedValue.Value
+	Dim listName, listValue
+	listName = Array("1", "2", "3") ' List for taggedValue.Name
+	listValue = Array() ' List for taggedValue.Value
+		
+    select case treeSelectedType
+
+        case otPackage
+            ' ' Code for when a package is selected
+            dim thePackage as EA.Package
+            set thePackage = Repository.GetTreeSelectedObject()
+			' Construct the message to display the tagged values
+			' Construct the message to inform the user about potential deletions
+			Dim msg
+			msg = "This operation may delete taggedValues with the following names or values from your model:" & vbCrLf & vbCrLf
+			msg = msg & "- Names: " & Join(listName, ", ") & vbCrLf
+			msg = msg & "- Values: " & Join(listValue, ", ") & vbCrLf & vbCrLf
+			msg = msg & "Are you sure you want to continue?"
+
+			' Show the confirmation message to the user
+			continueProcess = MsgBox(msg, vbYesNo + vbQuestion, "Warning")
+			If continueProcess = vbYes Then
+				ManageElements thePackage, listName, listValue
+			Else
+				MsgBox "Process cancelled.", vbInformation, "Cancelled"
+			End If
+
+
+        case else
+            ' Error message
+            Session.Prompt "This script does not support items of this type.", promptOK
+
+    end select
+
+end sub
+ 
+OnProjectBrowserScript 
