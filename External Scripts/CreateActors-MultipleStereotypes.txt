@@ -1,0 +1,137 @@
+' The script, written by Chany Jacobs, 
+' is designed to create actors based on classes with specific stereotypes in the selected package or its sub-packages.
+' Actors are created in a designated package and assigned the class's stereotype and note.
+' Modified to support multiple stereotypes and a designated package for created actors.
+' Modified and tested on 05-12-2024
+
+Option Explicit
+!INC Local Scripts.EAConstants-VBScript
+
+' Function to check if an actor already exists
+Function actorExists(repository, stereotypeList)
+    Dim sqlQuery
+    sqlQuery = "SELECT e.Name FROM(( t_object e INNER JOIN t_connector c ON e.Object_ID = c.Start_Object_ID ) INNER JOIN t_object s ON c.End_Object_ID = s.Object_ID ) WHERE e.Object_Type='Actor' AND s.Stereotype IN (" & stereotypeList & ") AND (c.Connector_Type = 'Realisation' OR c.Connector_Type ='Generalization')"
+
+    Dim result
+    result = repository.SQLQuery(sqlQuery)
+    actorExists = result
+End Function
+
+' Function to get or create a package for auto-created actors
+Function getOrCreateTargetPackage(repository, parentPackage, packageName)
+    Dim subPackage
+    For Each subPackage In parentPackage.Packages
+        If subPackage.Name = packageName Then
+            Set getOrCreateTargetPackage = subPackage
+            Exit Function
+        End If
+    Next
+    
+    ' Create the package if it doesn't exist
+    Set getOrCreateTargetPackage = parentPackage.Packages.AddNew(packageName, "")
+    getOrCreateTargetPackage.Update
+End Function
+
+' Function to create and add actors with specific stereotypes
+Sub createAndAddActors(repository, sourcePackage, targetPackage, stereotypeList)
+    Dim numActors
+    numActors = 0
+    If Not sourcePackage Is Nothing Then
+        Dim actorExistsResult
+        actorExistsResult = actorExists(repository, stereotypeList)
+		
+		Dim xmlDoc
+		Set xmlDoc = CreateObject("MSXML2.DOMDocument")
+		xmlDoc.LoadXml(actorExistsResult)
+
+		Dim rowNodes
+		Set rowNodes = xmlDoc.SelectNodes("//Row/Name")
+
+        Dim element
+        For Each element In sourcePackage.Elements
+		
+			Dim flag
+			flag = False
+			Dim row
+			For Each row In rowNodes
+				If row.text = element.Name Then
+					flag = True
+					Exit For
+				End If
+			Next
+			
+            If InStr(1, stereotypeList, "'" & element.Stereotype & "'", vbTextCompare) > 0 And element.Type = "Class" And Not flag Then
+                Dim newActor
+                Set newActor = targetPackage.Elements.AddNew(element.Name, "Actor")
+                
+                ' Add the stereotype and note of the class to the actor
+                newActor.Stereotype = element.Stereotype
+                newActor.Notes = element.Notes
+                newActor.Update
+                
+                ' Create a realization connector
+                Dim connector
+                Set connector = targetPackage.Connectors.AddNew("", "Realisation")
+                connector.ClientID = newActor.ElementID
+                connector.SupplierID = element.ElementID
+                connector.Update
+                
+                numActors = numActors + 1
+            End If
+        Next
+        
+        Session.Output numActors & " Actors created and added successfully in package: " & sourcePackage.Name
+        
+        Dim subPackage
+        For Each subPackage In sourcePackage.Packages
+            createAndAddActors repository, subPackage, targetPackage, stereotypeList
+        Next
+    End If
+End Sub
+
+' Main function
+Sub main()
+	Session.Output "Process begins."
+    Repository.EnsureOutputVisible "Script"
+    Dim sourcePackage
+    Set sourcePackage = Repository.GetTreeSelectedPackage()
+    
+	If Not sourcePackage Is Nothing Then
+        Dim stereotypeInput
+        stereotypeInput = InputBox("Please enter stereotypes (comma-separated, press Cancel to cancel): ", "Enter Stereotypes", "Subsystem,SWSubsystem")
+        
+        If stereotypeInput = "" Then
+            MsgBox "Process cancelled."
+			Session.Output "Process cancelled."
+        Else
+            Dim targetPackageName
+            targetPackageName = "AutoCreatedActors"
+            
+            Dim continueProcess
+            continueProcess = MsgBox("This operation may make changes to your model. Are you sure you want to continue?", vbYesNo + vbQuestion, "Warning")
+            
+            If continueProcess = vbYes Then
+                ' Format stereotype list for SQL
+                Dim stereotypeList
+                stereotypeList = "'" & Replace(stereotypeInput, ",", "','") & "'"
+                
+                ' Get or create the target package
+                Dim targetPackage
+                Set targetPackage = getOrCreateTargetPackage(Repository, sourcePackage, targetPackageName)
+                
+                ' Start the actor creation process
+                createAndAddActors Repository, sourcePackage, targetPackage, stereotypeList
+            Else
+                MsgBox "Process cancelled."
+				Session.Output "Process cancelled."
+            End If
+        End If
+    Else
+        MsgBox "This script requires a package to be selected."
+		Session.Output "No package selected."
+    End If
+	Session.Output "Process ended."
+End Sub
+
+' Call the main function
+main
